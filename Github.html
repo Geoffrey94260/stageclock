@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stageclock — Timer de scène professionnel</title>
+  <meta name="description" content="Timer de scène open-source pour événements live. NDI, Bitfocus Companion, multi-écran. macOS & Windows."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #060608;
+      --surface: #0e0e12;
+      --surface2: #15151b;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --text: #f0ede8;
+      --muted: rgba(240,237,232,0.45);
+      --faint: rgba(240,237,232,0.18);
+      --green: #1D9E75;
+      --green-light: #5DCAA5;
+      --amber: #EF9F27;
+      --red: #E24B4A;
+      --accent: #5DCAA5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 60px;
+      background: rgba(6,6,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(29,158,117,0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 5px rgba(29,158,117,0); }
+    }
+    .nav-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-link {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-cta {
+      font-size: 13px;
+      font-weight: 500;
+      color: #000;
+      background: var(--green-light);
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 7px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .nav-cta:hover { background: #7ed9bb; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 80px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Radial glow behind hero */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(29,158,117,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Horizontal scan line */
+    .scanline {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.012) 2px,
+        rgba(255,255,255,0.012) 4px
+      );
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      border: 0.5px solid rgba(93,202,165,0.3);
+      background: rgba(93,202,165,0.06);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-label-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--green-light);
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 8px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--green-light);
+    }
+
+    .hero-timer {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(72px, 12vw, 140px);
+      font-weight: 300;
+      letter-spacing: -4px;
+      color: rgba(240,237,232,0.08);
+      line-height: 1;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s 0.15s ease both;
+      position: relative;
+    }
+    .hero-timer span {
+      color: var(--text);
+      opacity: 1;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+      margin-bottom: 80px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #000;
+      background: var(--text);
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 9px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #fff; transform: translateY(-2px); }
+    .btn-primary svg { width: 16px; height: 16px; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 9px;
+      border: 0.5px solid var(--border2);
+      background: rgba(255,255,255,0.03);
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover { color: var(--text); background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+
+    /* ── MOCK UI ── */
+    .hero-mock {
+      position: relative;
+      width: 100%;
+      max-width: 860px;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+    .mock-frame {
+      background: #0a0a0b;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.06);
+    }
+    .mock-bar {
+      height: 36px;
+      background: #0a0a0b;
+      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 6px;
+    }
+    .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-bar-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .mock-menu {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.04em;
+    }
+    .mock-body {
+      display: flex;
+      height: 320px;
+    }
+    .mock-sidebar {
+      width: 160px;
+      border-right: 0.5px solid rgba(255,255,255,0.07);
+      padding: 12px 10px;
+    }
+    .mock-scene-label {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 8px;
+      padding: 0 6px;
+      font-family: 'DM Mono', monospace;
+    }
+    .mock-scene {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 8px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+    }
+    .mock-scene.active { background: rgba(255,255,255,0.07); }
+    .mock-scene-dot { width: 5px; height: 5px; border-radius: 50%; background: #1D9E75; flex-shrink: 0; }
+    .mock-scene-name { font-size: 11px; color: rgba(255,255,255,0.75); }
+    .mock-scene-dur { font-size: 9px; font-family: 'DM Mono', monospace; color: rgba(255,255,255,0.3); }
+    .mock-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 20px;
+      position: relative;
+    }
+    .mock-timer {
+      font-family: 'DM Mono', monospace;
+      font-size: 72px;
+      font-weight: 300;
+      letter-spacing: -3px;
+      color: #fff;
+      line-height: 1;
+    }
+    .mock-progress {
+      width: 60%;
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 2px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+    .mock-progress-fill {
+      height: 100%;
+      width: 65%;
+      background: #1D9E75;
+      border-radius: 2px;
+    }
+    .mock-controls {
+      display: flex;
+      gap: 6px;
+      margin-top: 20px;
+    }
+    .mock-btn {
+      height: 28px;
+      padding: 0 14px;
+      border-radius: 6px;
+      border: 0.5px solid rgba(255,255,255,0.12);
+      background: #fff;
+      color: #000;
+      font-size: 11px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+    }
+    .mock-btn.ghost {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.6);
+    }
+    .mock-ndi {
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 9px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(29,158,117,0.15);
+      color: #5DCAA5;
+      border: 0.5px solid rgba(93,202,165,0.25);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── FEATURES ── */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+    .section-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 60px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .feature {
+      background: var(--surface);
+      padding: 32px 28px;
+      transition: background 0.2s;
+    }
+    .feature:hover { background: var(--surface2); }
+    .feature-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .feature-icon.green { background: rgba(29,158,117,0.12); }
+    .feature-icon.amber { background: rgba(239,159,39,0.12); }
+    .feature-icon.blue  { background: rgba(55,138,221,0.12); }
+    .feature-icon.coral { background: rgba(226,75,74,0.12); }
+    .feature-icon.purple{ background: rgba(127,119,221,0.12); }
+    .feature-icon.teal  { background: rgba(93,202,165,0.12); }
+    .feature-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── SPECS ── */
+    .specs-section { background: var(--surface); }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+    @media (max-width: 640px) { .specs-grid { grid-template-columns: 1fr; } }
+    .spec-group-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 16px;
+    }
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 13px;
+    }
+    .spec-key { color: var(--muted); }
+    .spec-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .spec-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+    }
+    .badge-green { background: rgba(29,158,117,0.15); color: var(--green-light); }
+    .badge-amber { background: rgba(239,159,39,0.12); color: var(--amber); }
+
+    /* ── OSC TABLE ── */
+    .osc-section { background: var(--black); }
+    .osc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .osc-table th {
+      text-align: left;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--faint);
+      padding: 8px 16px;
+      border-bottom: 0.5px solid var(--border);
+      font-weight: 400;
+    }
+    .osc-table td {
+      padding: 11px 16px;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--muted);
+    }
+    .osc-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .osc-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--green-light);
+    }
+    .osc-table td:last-child { color: var(--faint); font-size: 12px; }
+
+    /* ── INSTALL ── */
+    .install-section { background: var(--surface); }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .step {
+      display: flex;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--faint);
+      width: 28px;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .code-block {
+      background: var(--black);
+      border: 0.5px solid var(--border2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--green-light);
+      overflow-x: auto;
+      line-height: 1.8;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--black);
+      text-align: center;
+    }
+    .cta-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+    .cta-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .cta-title em { font-style: italic; color: var(--green-light); }
+    .cta-sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--faint);
+    }
+    footer a { color: var(--faint); text-decoration: none; }
+    footer a:hover { color: var(--muted); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-dot"></div>
+    <span class="nav-name">Stageclock</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#features">Fonctionnalités</a>
+    <a class="nav-link" href="#companion">Companion</a>
+    <a class="nav-link" href="#install">Installation</a>
+    <a class="nav-link" href="https://github.com/Geoffrey94260/stageclock" target="_blank">GitHub ↗</a>
+    <a class="nav-cta" href="https://github.com/Geoffrey94260/stageclock/releases/latest">
+      Télécharger
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="scanline"></div>
+
+  <div class="hero-label">
+    <div class="hero-label-dot"></div>
+    Open-source · macOS & Windows
+  </div>
+
+  <h1>Le timer de scène<br/>pour les <em>professionnels</em></h1>
+
+  <div class="hero-timer">
+    <span>12</span>:47
+  </div>
+
+  <p class="hero-sub">
+    NDI natif. Bitfocus Companion. Multi-écran. Messages en direct.
+    Tout ce qu'il faut pour ne jamais perdre le contrôle d'un événement live.
+  </p>
+
+  <div class="hero-actions">
+    <a class="btn-primary" href="https://github.com/Geoffrey94260/stageclock/releases/latest">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 10.5l-3.5 3.5-3.5-3.5L5.5 9l2 2V4h1v7l2-2 1 1.5z"/></svg>
+      Télécharger pour Windows
+    </a>
+    <a class="btn-secondary" href="https://github.com/Geoffrey94260/stageclock">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      Voir sur GitHub
+    </a>
+  </div>
+
+  <!-- Mock UI -->
+  <div class="hero-mock">
+    <div class="mock-frame">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#E24B4A;"></div>
+        <div class="mock-dot" style="background:#EF9F27;"></div>
+        <div class="mock-dot" style="background:#1D9E75;"></div>
+        <div class="mock-bar-center">
+          <span class="mock-menu">Fichier</span>
+          <span class="mock-menu">Output</span>
+          <span class="mock-menu">Paramètres</span>
+        </div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-scene-label">Rundown</div>
+          <div class="mock-scene active">
+            <div class="mock-scene-dot"></div>
+            <div>
+              <div class="mock-scene-name">Ouverture</div>
+              <div class="mock-scene-dur">15:00</div>
+            </div>
+          </div>
+          <div class="mock-scene">
+            <div class="mock-scene-dot" style="background:rgba(255,255,255,0.15);"></div>
+            <div>
+              <div class="mock-scene-name" style="opacity:0.45;">Keynote</div>
+              <div class="mock-scene-dur">20:00</div>
+            </div>
+          </div>
+          <div class="mock-scene">
+            <div class="mock-scene-dot" style="background:rgba(255,255,255,0.15);"></div>
+            <div>
+              <div class="mock-scene-name" style="opacity:0.45;">Table ronde</div>
+              <div class="mock-scene-dur">30:00</div>
+            </div>
+          </div>
+          <div class="mock-scene">
+            <div class="mock-scene-dot" style="background:rgba(255,255,255,0.15);"></div>
+            <div>
+              <div class="mock-scene-name" style="opacity:0.45;">Q&A</div>
+              <div class="mock-scene-dur">10:00</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-stage">
+          <div class="mock-ndi">NDI ●</div>
+          <div class="mock-timer">12:47</div>
+          <div class="mock-progress">
+            <div class="mock-progress-fill"></div>
+          </div>
+          <div class="mock-controls">
+            <div class="mock-btn">Pause</div>
+            <div class="mock-btn ghost">Reset</div>
+            <div class="mock-btn ghost">Suivante →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Fonctionnalités</div>
+    <h2 class="section-title reveal">Tout ce dont vous avez besoin,<br/>rien de superflu.</h2>
+    <p class="section-sub reveal">Conçu pour les techniciens de plateau, les régisseurs et les équipes de production live.</p>
+
+    <div class="features-grid reveal">
+      <div class="feature">
+        <div class="feature-icon green">📡</div>
+        <div class="feature-name">Sortie NDI</div>
+        <div class="feature-desc">Diffusez le timer directement sur votre réseau via NDI. Compatible vMix, OBS, Resolume et tous les logiciels NDI.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon amber">🎛</div>
+        <div class="feature-name">Bitfocus Companion</div>
+        <div class="feature-desc">Contrôlez Stageclock depuis votre Stream Deck via OSC (port 5005) ou WebSocket (port 8080). Play, pause, reset, scène suivante.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon blue">📺</div>
+        <div class="feature-name">Multi-écran</div>
+        <div class="feature-desc">Ouvrez la fenêtre output sur n'importe quel écran externe. Redimensionnable, déplaçable, plein écran à la demande.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon coral">⚡</div>
+        <div class="feature-name">Rundown complet</div>
+        <div class="feature-desc">Gérez plusieurs scènes dans un rundown. Ajoutez, réordonnez, supprimez. Auto-avance optionnelle à la fin de chaque scène.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon purple">💬</div>
+        <div class="feature-name">Messages en direct</div>
+        <div class="feature-desc">Envoyez des messages texte qui s'affichent en overlay sur l'écran de sortie. Affichez ou masquez d'un clic.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon teal">💾</div>
+        <div class="feature-name">Sessions</div>
+        <div class="feature-desc">Sauvegardez et rechargez vos rundowns complets en JSON. Tous les paramètres sont inclus dans le fichier de session.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS -->
+<section id="specs" class="specs-section">
+  <div class="section-inner">
+    <div class="section-label">Spécifications</div>
+    <h2 class="section-title reveal">Les détails qui comptent.</h2>
+
+    <div class="specs-grid reveal">
+      <div>
+        <div class="spec-group-title">Timer</div>
+        <div class="spec-row">
+          <span class="spec-key">Précision</span>
+          <span class="spec-val">Web Worker — ±0ms</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Modes</span>
+          <span class="spec-val">Compte à rebours · Overtime</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Ajustements rapides</span>
+          <span class="spec-val">±5s ±10s ±30s</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Alerte sonore</span>
+          <span class="spec-val"><span class="spec-badge badge-green">Inclus</span></span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Flash overtime</span>
+          <span class="spec-val"><span class="spec-badge badge-green">Inclus</span></span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Barre de progression</span>
+          <span class="spec-val">Vert → Orange (30s) → Rouge (10s)</span>
+        </div>
+      </div>
+      <div>
+        <div class="spec-group-title">Intégrations</div>
+        <div class="spec-row">
+          <span class="spec-key">NDI</span>
+          <span class="spec-val">via NDI Tools · natif en option</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">OSC</span>
+          <span class="spec-val">UDP port 5005</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">WebSocket</span>
+          <span class="spec-val">port 8080</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Companion</span>
+          <span class="spec-val"><span class="spec-badge badge-green">Compatible</span></span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Plateforme</span>
+          <span class="spec-val">Windows 10+ · macOS 12+</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-key">Licence</span>
+          <span class="spec-val"><span class="spec-badge badge-amber">MIT · Open-source</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPANION / OSC -->
+<section id="companion" class="osc-section">
+  <div class="section-inner">
+    <div class="section-label">Bitfocus Companion</div>
+    <h2 class="section-title reveal">Contrôle total depuis<br/>votre Stream Deck.</h2>
+    <p class="section-sub reveal">Connectez Stageclock à Bitfocus Companion via OSC ou WebSocket. Toutes les actions sont disponibles en un bouton.</p>
+
+    <div class="reveal" style="background:var(--surface);border:0.5px solid var(--border2);border-radius:12px;overflow:hidden;">
+      <table class="osc-table">
+        <thead>
+          <tr>
+            <th>Adresse OSC</th>
+            <th>WebSocket JSON</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>/stageclock/play</td><td>{"cmd":"play"}</td><td>Démarrer le timer</td></tr>
+          <tr><td>/stageclock/pause</td><td>{"cmd":"pause"}</td><td>Mettre en pause</td></tr>
+          <tr><td>/stageclock/toggle</td><td>{"cmd":"toggle"}</td><td>Play / Pause</td></tr>
+          <tr><td>/stageclock/reset</td><td>{"cmd":"reset"}</td><td>Remettre à zéro</td></tr>
+          <tr><td>/stageclock/next</td><td>{"cmd":"next"}</td><td>Scène suivante</td></tr>
+          <tr><td>/stageclock/plus30</td><td>{"cmd":"plus30"}</td><td>+30 secondes</td></tr>
+          <tr><td>/stageclock/minus30</td><td>{"cmd":"minus30"}</td><td>−30 secondes</td></tr>
+          <tr><td>/stageclock/plus60</td><td>{"cmd":"plus60"}</td><td>+60 secondes</td></tr>
+          <tr><td>/stageclock/minus60</td><td>{"cmd":"minus60"}</td><td>−60 secondes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;display:flex;gap:16px;flex-wrap:wrap;" class="reveal">
+      <div class="code-block" style="flex:1;min-width:220px;">
+        # OSC — port UDP 5005<br/>
+        Adresse IP : 127.0.0.1<br/>
+        Port : 5005
+      </div>
+      <div class="code-block" style="flex:1;min-width:220px;">
+        # WebSocket — port 8080<br/>
+        ws://127.0.0.1:8080<br/>
+        Format : JSON { "cmd": "play" }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install" class="install-section">
+  <div class="section-inner">
+    <div class="section-label">Installation</div>
+    <h2 class="section-title reveal">Opérationnel en 2 minutes.</h2>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Télécharger l'installeur</div>
+          <div class="step-desc">Téléchargez le fichier <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green-light);">.exe</code> depuis la page GitHub Releases et lancez-le. L'installation prend moins d'une minute.</div>
+          <a class="btn-secondary" href="https://github.com/Geoffrey94260/stageclock/releases/latest" style="display:inline-flex;margin-top:8px;font-size:13px;">
+            GitHub Releases ↗
+          </a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">NDI — installer NDI Tools (gratuit)</div>
+          <div class="step-desc">Pour diffuser le timer en NDI sur votre réseau, installez NDI Tools de Vizrt. Utilisez ensuite "NDI Screen Capture" pour capturer la fenêtre output de Stageclock.</div>
+          <a class="btn-secondary" href="https://ndi.video/tools/" target="_blank" style="display:inline-flex;margin-top:8px;font-size:13px;">
+            ndi.video/tools ↗
+          </a>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Bitfocus Companion (optionnel)</div>
+          <div class="step-desc">Dans Companion, ajoutez un module "Generic OSC" pointant vers <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green-light);">127.0.0.1:5005</code>. Assignez les adresses OSC à vos boutons Stream Deck.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Compiler depuis les sources (développeurs)</div>
+          <div class="step-desc">Node.js 18+ requis.</div>
+          <div class="code-block">
+            git clone https://github.com/Geoffrey94260/stageclock<br/>
+            cd stageclock<br/>
+            npm install<br/>
+            npm run dev
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <p class="section-label">Open-source · Gratuit · MIT</p>
+    <h2 class="cta-title reveal">Prêt pour votre<br/><em>prochain événement ?</em></h2>
+    <p class="cta-sub reveal">Stageclock est gratuit, open-source, et maintenu activement.</p>
+    <div class="hero-actions reveal">
+      <a class="btn-primary" href="https://github.com/Geoffrey94260/stageclock/releases/latest">
+        Télécharger gratuitement
+      </a>
+      <a class="btn-secondary" href="https://github.com/Geoffrey94260/stageclock">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Star sur GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+    <span>Stageclock — open-source MIT</span>
+  </div>
+  <div style="display:flex;gap:20px;">
+    <a href="https://github.com/Geoffrey94260/stageclock">GitHub</a>
+    <a href="https://github.com/Geoffrey94260/stageclock/releases">Releases</a>
+    <a href="https://github.com/Geoffrey94260/stageclock/issues">Issues</a>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') })
+  }, { threshold: 0.1 })
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
+
+  // Live timer in hero
+  let t = 12 * 60 + 47
+  const timerEl = document.querySelector('.mock-timer')
+  const heroTimer = document.querySelector('.hero-timer')
+  setInterval(() => {
+    if (t > 0) t--
+    const m = Math.floor(t / 60)
+    const s = t % 60
+    const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    if (timerEl) timerEl.textContent = str
+    if (heroTimer) heroTimer.innerHTML = `<span>${String(m).padStart(2,'0')}</span>:${String(s).padStart(2,'0')}`
+    const fill = document.querySelector('.mock-progress-fill')
+    if (fill) fill.style.width = (t / (12*60+47) * 100) + '%'
+  }, 1000)
+</script>
+
+</body>
+</html>

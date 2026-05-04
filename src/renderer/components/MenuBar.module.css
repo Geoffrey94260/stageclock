@@ -1,0 +1,193 @@
+.bar {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 8px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  position: relative;
+  z-index: 100;
+  gap: 2px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px 0 4px;
+  margin-right: 4px;
+  border-right: 0.5px solid rgba(255,255,255,0.07);
+}
+.logoDot { width: 7px; height: 7px; border-radius: 50%; background: #fff; opacity: 0.85; }
+.logoName { font-size: 11px; font-weight: 500; letter-spacing: 0.07em; opacity: 0.45; text-transform: uppercase; }
+
+.menuItem { position: relative; }
+
+.trigger {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  border-radius: 5px;
+  transition: all 0.1s;
+}
+.trigger svg { opacity: 0.4; transition: transform 0.15s; }
+.trigger:hover, .trigger.open { background: rgba(255,255,255,0.07); color: #fff; }
+.trigger.open svg { transform: rotate(180deg); opacity: 0.7; }
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 260px;
+  background: #141416;
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+  animation: fadeIn 0.1s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+.section {
+  padding: 6px 10px 3px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  margin-top: 2px;
+}
+
+.ddItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  transition: all 0.1s;
+}
+.ddItem:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.ddItem.danger:hover { background: rgba(226,75,74,0.1); color: #E24B4A; }
+.ddIcon { width: 16px; text-align: center; font-size: 12px; opacity: 0.6; flex-shrink: 0; }
+.ddLabel { flex: 1; }
+.shortcut { font-size: 10px; font-family: 'DM Mono', monospace; opacity: 0.3; }
+
+.sep { height: 0.5px; background: rgba(255,255,255,0.07); margin: 4px 0; }
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+}
+.toggleRow:hover { background: rgba(255,255,255,0.04); }
+
+.toggle {
+  width: 30px; height: 16px; border-radius: 8px;
+  background: rgba(255,255,255,0.12);
+  position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+}
+.toggle::after {
+  content: ''; width: 12px; height: 12px; border-radius: 50%; background: #fff;
+  position: absolute; top: 2px; left: 2px; transition: left 0.2s;
+}
+.toggleOn { background: #1D9E75; }
+.toggleOn::after { left: 16px; }
+
+.selectRow { padding: 5px 10px; display: flex; flex-direction: column; gap: 4px; }
+.selectLabel { font-size: 10px; color: rgba(255,255,255,0.3); }
+
+.select {
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  padding: 5px 8px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  width: 100%;
+}
+.select option { background: #1a1a1c; color: #fff; }
+
+.input {
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  padding: 5px 8px;
+  font-family: 'DM Sans', sans-serif;
+  width: 100%;
+}
+
+.colorRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+.colorLabel { color: rgba(255,255,255,0.7); flex: 1; }
+.swatches { display: flex; gap: 5px; }
+.swatch {
+  width: 18px; height: 18px; border-radius: 4px; cursor: pointer;
+  border: 1.5px solid transparent; transition: all 0.1s;
+}
+.activeSwatch { border-color: #fff; }
+
+.rightArea {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.statusDot { width: 6px; height: 6px; border-radius: 50%; transition: background 0.3s; }
+.statusLabel { font-size: 11px; opacity: 0.4; }
+.ndiBadge {
+  font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 4px;
+  background: rgba(29,158,117,0.15); color: #5DCAA5;
+  border: 0.5px solid rgba(93,202,165,0.25);
+}
+
+.winControls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.winBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+.winBtn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.8);
+}
+.closeBtn:hover {
+  background: rgba(226,75,74,0.2);
+  color: #E24B4A;
+}
