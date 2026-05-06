@@ -1,6 +1,6 @@
 # Stageclock
 
-Timer de scène professionnel pour événements live — macOS & Windows.
+Timer de scène professionnel pour événements live — Windows.
 
 ## Features
 - Timer multi-scène (compte à rebours, overtime avec flash)
@@ -14,60 +14,6 @@ Timer de scène professionnel pour événements live — macOS & Windows.
 - Design sombre élégant, typographie DM Mono
 
 ---
-
-## Installation
-
-### Prérequis
-- Node.js 18+
-- macOS 12+ ou Windows 10+
-
-### Setup
-
-```bash
-git clone https://github.com/yourname/stageclock.git
-cd stageclock
-npm install
-```
-
-### Développement
-
-```bash
-npm run dev
-```
-
-Cela lance Vite (port 5173) et Electron en parallèle avec hot-reload.
-
-### Build
-
-```bash
-# macOS (dmg universel arm64 + x64)
-npm run build:mac
-
-# Windows (NSIS installer)
-npm run build:win
-```
-
-Les builds sont dans le dossier `release/`.
-
----
-
-## NDI
-
-La sortie NDI nécessite :
-
-1. Installer le **NDI Runtime** de Vizrt (gratuit) : https://ndi.video/tools/
-2. Installer le binding natif :
-
-```bash
-npm install granddio/ndi
-npm run rebuild  # electron-rebuild
-```
-
-3. Dans `src/main/main.ts`, décommenter le bloc NDI et implémenter le rendu canvas → NDI.
-
----
-
-## Bitfocus Companion
 
 ### Commandes OSC disponibles (UDP port 5005)
 
