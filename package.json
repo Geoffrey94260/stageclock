@@ -65,8 +65,7 @@
             "x64"
           ]
         }
-      ],
-      "icon": "public/icon.ico"
+      ]
     },
     "mac": {
       "category": "public.app-category.utilities",
@@ -78,18 +77,21 @@
             "x64"
           ]
         }
-      ],
-      "icon": "public/icon.icns"
+      ]
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "public/icon.ico",
-      "uninstallerIcon": "public/icon.ico"
+      "allowToChangeInstallationDirectory": true
     },
     "asar": true,
     "asarUnpack": [
       "node_modules/koffi/**/*"
+    ],
+    "extraFiles": [
+      {
+        "from": "node_modules/electron/dist/ffmpeg.dll",
+        "to": "ffmpeg.dll"
+      }
     ],
     "publish": {
       "provider": "github",
