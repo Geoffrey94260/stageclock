@@ -1,0 +1,194 @@
+.panel {
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  padding: 10px 16px 12px;
+  background: rgba(255,255,255,0.015);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+.headerActions {
+  display: flex;
+  gap: 6px;
+}
+.hideBtn {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  border: 0.5px solid rgba(226,75,74,0.3);
+  background: rgba(226,75,74,0.08);
+  color: rgba(226,75,74,0.8);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.1s;
+}
+.hideBtn:hover { background: rgba(226,75,74,0.15); color: #E24B4A; }
+
+.clearAllBtn {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  border: 0.5px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: rgba(255,255,255,0.3);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.1s;
+}
+.clearAllBtn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); }
+
+/* Active preview bar */
+.activePreview {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  background: rgba(29,158,117,0.1);
+  border: 0.5px solid rgba(29,158,117,0.25);
+  border-radius: 6px;
+}
+.activeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1D9E75;
+  flex-shrink: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+.activeText {
+  font-size: 11px;
+  color: #5DCAA5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* History */
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.bubble {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  transition: background 0.1s;
+}
+.bubble:hover { background: rgba(255,255,255,0.07); }
+.activeBubble {
+  background: rgba(29,158,117,0.08);
+  border-color: rgba(29,158,117,0.2);
+}
+
+.bubbleLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.bubbleRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: rgba(255,255,255,0.3);
+  transition: color 0.1s;
+}
+.toggleBtn:hover { color: rgba(255,255,255,0.7); }
+.toggleOn { color: #1D9E75; }
+
+.bubbleText {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activeBubble .bubbleText { color: rgba(255,255,255,0.9); }
+
+.bubbleTime {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: rgba(255,255,255,0.25);
+}
+.delBtn {
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(255,255,255,0.2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color 0.1s;
+}
+.delBtn:hover { color: #E24B4A; }
+
+/* Input row */
+.row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  color: #fff;
+  font-size: 12px;
+  padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input::placeholder { color: rgba(255,255,255,0.2); }
+.input:focus { border-color: rgba(239,159,39,0.4); }
+
+.sendBtn {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 7px;
+  border: 0.5px solid rgba(239,159,39,0.35);
+  background: rgba(239,159,39,0.1);
+  color: #EF9F27;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.sendBtn:hover { background: rgba(239,159,39,0.18); }

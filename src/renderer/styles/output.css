@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+  font-family: 'DM Mono', monospace;
+  user-select: none;
+}
+
+.output {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  gap: 0;
+}
+
+.scene-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 28px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Timer digits */
+.timer {
+  font-family: 'DM Mono', monospace;
+  font-weight: 300;
+  letter-spacing: -6px;
+  line-height: 1;
+  text-align: center;
+  transition: color 0.3s;
+}
+.overtime {
+  animation: flash 0.7s step-start infinite;
+}
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.1; }
+}
+
+.overtime-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #E24B4A;
+  margin-top: 20px;
+  animation: flash 0.7s step-start infinite;
+}
+
+/* Progress bar — below the timer, thick */
+.progress-track {
+  width: 70%;
+  height: 14px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 7px;
+  overflow: hidden;
+  margin-top: 40px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.9s linear, background 0.4s ease;
+}
+
+/* Live message overlay */
+.msg-overlay {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(239,159,39,0.4);
+  border-radius: 12px;
+  padding: 16px 32px;
+  max-width: 80%;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.msg-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 36px;
+  font-weight: 300;
+  color: #EF9F27;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
