@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#0a0a0b"/>
+
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#1D9E75" stroke-width="16"/>
+
+  <!-- Clock tick marks -->
+  <line x1="256" y1="52" x2="256" y2="80" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <line x1="256" y1="432" x2="256" y2="460" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <line x1="52" y1="256" x2="80" y2="256" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <line x1="432" y1="256" x2="460" y2="256" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Minor ticks -->
+  <line x1="374" y1="82" x2="361" y2="104" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="430" y1="138" x2="408" y2="151" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="430" y1="374" x2="408" y2="361" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="374" y1="430" x2="361" y2="408" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="138" y1="430" x2="151" y2="408" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="82" y1="374" x2="104" y2="361" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="82" y1="138" x2="104" y2="151" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+  <line x1="138" y1="82" x2="151" y2="104" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Hour hand (pointing ~10 o'clock) -->
+  <line x1="256" y1="256" x2="178" y2="166" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Minute hand (pointing ~2 o'clock) -->
+  <line x1="256" y1="256" x2="340" y2="148" stroke="#1D9E75" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Center dot -->
+  <circle cx="256" cy="256" r="14" fill="#1D9E75"/>
+  <circle cx="256" cy="256" r="7" fill="#ffffff"/>
+</svg>

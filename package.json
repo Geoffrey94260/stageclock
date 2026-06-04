@@ -1,0 +1,105 @@
+{
+  "name": "stageclock",
+  "version": "2.0.0",
+  "description": "Professional stage timer for live events",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "npx --no-install vite",
+    "generate-icon": "node scripts/generate-icon.mjs",
+    "build": "node scripts/generate-icon.mjs && npx --no-install vite build && npx --no-install electron-builder",
+    "build:win": "node scripts/generate-icon.mjs && npx --no-install vite build && npx --no-install electron-builder --win",
+    "build:mac": "npx --no-install vite build && npx --no-install electron-builder --mac",
+    "preview": "npx --no-install vite preview",
+    "rebuild": "npx --no-install electron-rebuild -f -w koffi",
+    "build:publish": "npx --no-install vite build && npx --no-install electron-builder --win --publish always"
+  },
+  "keywords": [
+    "timer",
+    "stage",
+    "ndi",
+    "companion",
+    "electron"
+  ],
+  "author": "Stageclock",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/ws": "^8.5.10",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.0.0",
+    "electron": "^27.3.11",
+    "electron-builder": "^24.0.0",
+    "electron-rebuild": "^3.2.9",
+    "typescript": "^5.0.0",
+    "vite": "^5.1.0",
+    "vite-plugin-electron": "^0.28.4",
+    "vite-plugin-electron-renderer": "^0.14.5"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "zustand": "^4.0.0",
+    "osc": "^2.4.3",
+    "ws": "^8.16.0",
+    "electron-updater": "^6.1.7",
+    "koffi": "^2.0.0"
+  },
+  "build": {
+    "appId": "com.stageclock.app",
+    "productName": "Stageclock",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "node_modules/**/*",
+      "!node_modules/.cache/**/*"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.utilities",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/koffi/**/*"
+    ],
+    "extraFiles": [
+      {
+        "from": "node_modules/electron/dist/ffmpeg.dll",
+        "to": "ffmpeg.dll"
+      }
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "Geoffrey94260",
+      "repo": "stageclock"
+    }
+  }
+}
