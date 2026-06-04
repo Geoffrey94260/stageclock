@@ -13,7 +13,6 @@ interface TimerStateMsg {
     timerColor: string
     fontSize: string
     showTitle: boolean
-    showTenths: boolean
   }
   messages: { id: string; text: string; active: boolean }[]
 }
@@ -28,7 +27,6 @@ const DEFAULT_STATE: TimerStateMsg = {
     timerColor: '#ffffff',
     fontSize: 'normal',
     showTitle: false,
-    showTenths: false,
   },
   messages: [],
 }
@@ -36,9 +34,12 @@ const DEFAULT_STATE: TimerStateMsg = {
 function fmt(secs: number): string {
   const neg = secs < 0
   const abs = Math.abs(secs)
-  const m = Math.floor(abs / 60)
+  const h = Math.floor(abs / 3600)
+  const m = Math.floor((abs % 3600) / 60)
   const ss = abs % 60
-  return `${neg ? '−' : ''}${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
+  const prefix = neg ? '−' : ''
+  if (h > 0) return `${prefix}${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
+  return `${prefix}${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
 }
 
 function barColor(remaining: number): string {
@@ -47,21 +48,29 @@ function barColor(remaining: number): string {
   return '#1D9E75'
 }
 
+function useClock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return now
+}
+
 export default function OutputWindow() {
   const [state, setState] = useState<TimerStateMsg>(DEFAULT_STATE)
   const [activeMsg, setActiveMsg] = useState<string | null>(null)
+  const now = useClock()
 
   useEffect(() => {
     const unsub = window.electronAPI?.onTimerState((s: unknown) => {
       const ts = s as TimerStateMsg
       setState(ts)
-      // Always reflect active message from store state — persistent until toggled off
       const active = ts.messages?.find(m => m.active)
       setActiveMsg(active?.text ?? null)
     })
     const unsubMsg = window.electronAPI?.onMessage((m: unknown) => {
       const msg = m as { text?: string; visible?: boolean }
-      // visible:false = hide message, otherwise show the text
       if (msg.visible === false) {
         setActiveMsg(null)
       } else if (msg.text) {
@@ -80,39 +89,37 @@ export default function OutputWindow() {
     <div className="output">
       <div className="stage">
 
-        {/* Scene title */}
         {state.settings.showTitle && (state.sceneFullName || state.sceneName) && (
           <div className="scene-name">{state.sceneFullName || state.sceneName}</div>
         )}
 
-        {/* Timer */}
         <div
           className={`timer ${overtime ? 'overtime' : ''}`}
-          style={{
-            fontSize,
-            color: overtime ? '#E24B4A' : state.settings.timerColor,
-          }}
+          style={{ fontSize, color: overtime ? '#E24B4A' : state.settings.timerColor }}
         >
           {fmt(remaining)}
         </div>
 
-        {/* Overtime label */}
         {overtime && <div className="overtime-label">temps dépassé</div>}
 
-        {/* Progress bar — below the timer */}
+        <div className="clock-wrap">
+          <span className="clock-time">
+            {String(now.getHours()).padStart(2,'0')}:{String(now.getMinutes()).padStart(2,'0')}:{String(now.getSeconds()).padStart(2,'0')}
+          </span>
+          <span className="clock-date">
+            {now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+        </div>
+
         <div className="progress-track">
           <div
             className="progress-fill"
-            style={{
-              width: overtime ? '0%' : `${pct}%`,
-              background: barColor(remaining),
-            }}
+            style={{ width: overtime ? '0%' : `${pct}%`, background: barColor(remaining) }}
           />
         </div>
 
       </div>
 
-      {/* Live message overlay */}
       {activeMsg && (
         <div className="msg-overlay">
           <div className="msg-text">{activeMsg}</div>

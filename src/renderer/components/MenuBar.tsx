@@ -207,6 +207,7 @@ export function MenuBar({ onToast }: Props) {
                 <option value="xlarge">Très large</option>
               </select>
             </div>
+<<<<<<< HEAD
             <ToggleRow icon="🔢" label="Afficher les dixièmes en fin" value={settings.showTenths}
               onChange={v => updateSettings({ showTenths: v })} />
             <ToggleRow icon="💬" label="Afficher le titre de scène" value={settings.showTitle}
@@ -217,6 +218,11 @@ export function MenuBar({ onToast }: Props) {
               onChange={v => updateSettings({ autoAdvance: v })} />
             <ToggleRow icon="🔔" label="Son d'alerte à 0" value={settings.soundAlert}
               onChange={v => updateSettings({ soundAlert: v })} />
+=======
+            <ToggleRow icon="💬" label="Afficher le titre de scène" value={settings.showTitle}
+              onChange={v => updateSettings({ showTitle: v })} />
+            <div className={s.sep} />
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
             <div className={s.selectRow}>
               <div className={s.selectLabel}>Protocole Companion</div>
               <select className={s.select} value={settings.companionProtocol}

@@ -7,9 +7,12 @@ const FONT_SIZES = { compact: 80, normal: 110, large: 140, xlarge: 180 }
 function fmt(secs: number): string {
   const neg = secs < 0
   const abs = Math.abs(secs)
-  const m = Math.floor(abs / 60)
+  const h = Math.floor(abs / 3600)
+  const m = Math.floor((abs % 3600) / 60)
   const ss = abs % 60
-  return `${neg ? '−' : ''}${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
+  const prefix = neg ? '−' : ''
+  if (h > 0) return `${prefix}${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
+  return `${prefix}${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
 }
 
 function barColor(remaining: number): string {
@@ -38,7 +41,7 @@ function fmtDate(d: Date) {
 export function TimerStage() {
   const {
     scenes, currentSceneIndex, elapsed, total, timerStatus,
-    play, pause, reset, adjust, nextScene, settings,
+    play, pause, reset, adjust, nextScene, previousScene, settings,
   } = useStore()
 
   const scene = scenes[currentSceneIndex]
@@ -52,14 +55,10 @@ export function TimerStage() {
 
   return (
     <div className={s.wrapper}>
-      {/* Progress bar */}
       <div className={s.progressTrack}>
         <div
           className={s.progressFill}
-          style={{
-            width: overtime ? '0%' : `${pct}%`,
-            background: barColor(remaining),
-          }}
+          style={{ width: overtime ? '0%' : `${pct}%`, background: barColor(remaining) }}
         />
       </div>
 
@@ -92,7 +91,6 @@ export function TimerStage() {
             <span className={s.clockDate}>{fmtDate(now)}</span>
           </div>
 
-          {/* Adjust buttons */}
           <div className={s.adjRow}>
             {[-30, -10, -5].map(d => (
               <button key={d} className={`${s.adjBtn} ${s.neg}`} onClick={() => adjust(d)}>
@@ -107,19 +105,16 @@ export function TimerStage() {
           </div>
         </div>
 
-        {/* Controls */}
         <div className={s.controls}>
+          <button className={s.ctrl} onClick={previousScene} disabled={currentSceneIndex === 0}>← Précédente</button>
           <button className={`${s.ctrl} ${s.primary}`} onClick={handlePlayPause}>
             {isRunning ? 'Pause' : 'Play'}
           </button>
           <button className={s.ctrl} onClick={reset}>Reset</button>
           <div className={s.spacer} />
-          {currentSceneIndex < scenes.length - 1 && (
-            <button className={s.ctrl} onClick={nextScene}>Suivante →</button>
-          )}
+          <button className={s.ctrl} onClick={nextScene} disabled={currentSceneIndex >= scenes.length - 1}>Suivante →</button>
         </div>
 
-        {/* Next scene */}
         {scenes[currentSceneIndex + 1] && (
           <div className={s.nextBar}>
             <span className={s.nextLabel}>suivant</span>

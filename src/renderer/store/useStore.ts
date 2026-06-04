@@ -19,10 +19,14 @@ export interface LiveMessage {
 export interface Settings {
   timerColor: string
   fontSize: 'compact' | 'normal' | 'large' | 'xlarge'
+<<<<<<< HEAD
   showTenths: boolean
   showTitle: boolean
   autoAdvance: boolean
   soundAlert: boolean
+=======
+  showTitle: boolean
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
   companionProtocol: 'osc' | 'ws' | 'both'
   oscPort: number
   wsPort: number
@@ -65,6 +69,10 @@ interface StoreState {
   removeScene: (id: string) => void
   selectScene: (index: number) => void
   nextScene: () => void
+<<<<<<< HEAD
+=======
+  previousScene: () => void
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
 
   // Actions — timer
   play: () => void
@@ -100,10 +108,14 @@ const DEFAULT_SCENES: Scene[] = []
 const DEFAULT_SETTINGS: Settings = {
   timerColor: '#ffffff',
   fontSize: 'normal',
+<<<<<<< HEAD
   showTenths: false,
   showTitle: true,
   autoAdvance: false,
   soundAlert: true,
+=======
+  showTitle: true,
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
   companionProtocol: 'both',
   oscPort: 5005,
   wsPort: 8080,
@@ -156,6 +168,14 @@ export const useStore = create<StoreState>((set, get) => ({
     if (currentSceneIndex < scenes.length - 1) selectScene(currentSceneIndex + 1)
   },
 
+<<<<<<< HEAD
+=======
+  previousScene: () => {
+    const { currentSceneIndex, selectScene } = get()
+    if (currentSceneIndex > 0) selectScene(currentSceneIndex - 1)
+  },
+
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
   // ── Timer ────────────────────────────────────────────────────────────────
   play: () => set({ timerStatus: 'running' }),
   pause: () => set({ timerStatus: 'paused' }),
@@ -164,6 +184,7 @@ export const useStore = create<StoreState>((set, get) => ({
   tick: () => set(s => {
     const elapsed = s.elapsed + 1
     const remaining = s.total - elapsed
+<<<<<<< HEAD
     let status: TimerStatus = remaining >= 0 ? 'running' : 'overtime'
 
     // Auto-advance
@@ -179,6 +200,9 @@ export const useStore = create<StoreState>((set, get) => ({
       }
     }
 
+=======
+    const status: TimerStatus = remaining >= 0 ? 'running' : 'overtime'
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
     return { elapsed, timerStatus: status }
   }),
 

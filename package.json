@@ -1,12 +1,22 @@
 {
   "name": "stageclock",
+<<<<<<< HEAD
   "version": "1.0.0",
+=======
+  "version": "2.0.0",
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
   "description": "Professional stage timer for live events",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "npx --no-install vite",
+<<<<<<< HEAD
     "build": "npx --no-install vite build && npx --no-install electron-builder",
     "build:win": "npx --no-install vite build && npx --no-install electron-builder --win",
+=======
+    "generate-icon": "node scripts/generate-icon.mjs",
+    "build": "node scripts/generate-icon.mjs && npx --no-install vite build && npx --no-install electron-builder",
+    "build:win": "node scripts/generate-icon.mjs && npx --no-install vite build && npx --no-install electron-builder --win",
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
     "build:mac": "npx --no-install vite build && npx --no-install electron-builder --mac",
     "preview": "npx --no-install vite preview",
     "rebuild": "npx --no-install electron-rebuild -f -w koffi",
@@ -58,6 +68,10 @@
       "!node_modules/.cache/**/*"
     ],
     "win": {
+<<<<<<< HEAD
+=======
+      "icon": "build/icon.ico",
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
       "target": [
         {
           "target": "nsis",
@@ -68,6 +82,10 @@
       ]
     },
     "mac": {
+<<<<<<< HEAD
+=======
+      "icon": "build/icon.icns",
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
       "category": "public.app-category.utilities",
       "target": [
         {
@@ -95,7 +113,11 @@
     ],
     "publish": {
       "provider": "github",
+<<<<<<< HEAD
       "owner": "TON-USERNAME-GITHUB",
+=======
+      "owner": "Geoffrey94260",
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
       "repo": "stageclock"
     }
   }

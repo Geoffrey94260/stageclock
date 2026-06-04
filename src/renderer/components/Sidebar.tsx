@@ -8,19 +8,47 @@ export function Sidebar() {
   const [newDur, setNewDur] = useState('')
 
   const parseDuration = (input: string): number => {
+<<<<<<< HEAD
     const str = input.trim()
     if (str.includes(':')) {
       const [m, sec] = str.split(':')
       return Math.max(5, parseInt(m || '0') * 60 + parseInt(sec || '0'))
     }
+=======
+    const str = input.trim().toLowerCase()
+
+    // HH:MM:SS or MM:SS
+    if (str.includes(':')) {
+      const parts = str.split(':').map(p => parseInt(p) || 0)
+      if (parts.length === 3) return Math.max(5, parts[0] * 3600 + parts[1] * 60 + parts[2])
+      return Math.max(5, parts[0] * 60 + (parts[1] || 0))
+    }
+
+    // 1h30m / 1h30 / 1h / 90m / 30s
+    const hMatch = str.match(/^(\d+)h(\d+)?m?$/)
+    if (hMatch) return Math.max(5, parseInt(hMatch[1]) * 3600 + (parseInt(hMatch[2] || '0') || 0) * 60)
+    const mMatch = str.match(/^(\d+)min?$/)
+    if (mMatch) return Math.max(5, parseInt(mMatch[1]) * 60)
+    const sMatch = str.match(/^(\d+)s$/)
+    if (sMatch) return Math.max(5, parseInt(sMatch[1]))
+
+    // Plain number: < 20 = minutes, otherwise seconds
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
     const n = parseInt(str)
     if (isNaN(n) || n <= 0) return 300
     return n < 20 ? n * 60 : n
   }
 
   const fmt = (secs: number) => {
+<<<<<<< HEAD
     const m = Math.floor(secs / 60)
     const ss = secs % 60
+=======
+    const h = Math.floor(secs / 3600)
+    const m = Math.floor((secs % 3600) / 60)
+    const ss = secs % 60
+    if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
     return `${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`
   }
 
@@ -71,8 +99,13 @@ export function Sidebar() {
         />
         <input
           className={s.input}
+<<<<<<< HEAD
           placeholder="Durée (ex : 5:00)"
           maxLength={8}
+=======
+          placeholder="Durée (5:00, 1h30, 90m…)"
+          maxLength={10}
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
           value={newDur}
           onChange={e => setNewDur(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()}

@@ -23,7 +23,11 @@ export default function App() {
   // Handle OSC/WebSocket commands from Companion
   useEffect(() => {
     const unsub = window.electronAPI?.onOSCCommand(({ cmd }) => {
+<<<<<<< HEAD
       const { play, pause, reset, nextScene, adjust } = useStore.getState()
+=======
+      const { play, pause, reset, nextScene, previousScene, adjust } = useStore.getState()
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
       switch (cmd) {
         case 'play': play(); break
         case 'pause': pause(); break
@@ -34,6 +38,10 @@ export default function App() {
         }
         case 'reset': reset(); break
         case 'next': nextScene(); break
+<<<<<<< HEAD
+=======
+        case 'prev': previousScene(); break
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
         case 'plus30': adjust(30); break
         case 'minus30': adjust(-30); break
         case 'plus60': adjust(60); break
@@ -47,10 +55,21 @@ export default function App() {
   useEffect(() => {
     const { settings } = useStore.getState()
     if (settings.companionProtocol === 'osc' || settings.companionProtocol === 'both') {
+<<<<<<< HEAD
       window.electronAPI?.startOSC(settings.oscPort)
     }
     if (settings.companionProtocol === 'ws' || settings.companionProtocol === 'both') {
       window.electronAPI?.startWS(settings.wsPort)
+=======
+      window.electronAPI?.startOSC(settings.oscPort).then((r: any) => {
+        if (!r?.success) showToast(`OSC port ${settings.oscPort} indisponible — ${r?.error ?? 'erreur'}`)
+      }).catch(() => {})
+    }
+    if (settings.companionProtocol === 'ws' || settings.companionProtocol === 'both') {
+      window.electronAPI?.startWS(settings.wsPort).then((r: any) => {
+        if (!r?.success) showToast(`WebSocket port ${settings.wsPort} indisponible — ${r?.error ?? 'erreur'}`)
+      }).catch(() => {})
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
     }
   }, [])
 

@@ -67,6 +67,32 @@ html, body, #root {
   animation: flash 0.7s step-start infinite;
 }
 
+<<<<<<< HEAD
+=======
+/* Clock & date */
+.clock-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 28px;
+}
+.clock-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 36px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.25);
+}
+.clock-date {
+  font-size: 20px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.15);
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+}
+
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
 /* Progress bar — below the timer, thick */
 .progress-track {
   width: 70%;

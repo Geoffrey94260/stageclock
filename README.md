@@ -8,26 +8,32 @@ Timer de scène professionnel pour événements live — Windows.
 - Sortie plein écran sur écran externe configurable
 - Sortie NDI (via `granddio/ndi`)
 - Contrôle Bitfocus Companion via OSC (port 5005) et/ou WebSocket (port 8080)
+- Navigation scène précédente / suivante (UI + OSC + WebSocket)
 - Messages en direct envoyés en overlay sur l'écran de sortie
+- Heure et date affichées sur l'écran de sortie
 - Sauvegarde / chargement de sessions `.stageclock.json`
 - Ajustements rapides ±5s, ±10s, ±30s
+- Formats de durée flexibles : `5:00`, `1h30`, `90min`, `1:30:00`
 - Design sombre élégant, typographie DM Mono
 
 ---
 
 ### Commandes OSC disponibles (UDP port 5005)
 
-| Adresse OSC               | Action              |
-|--------------------------|---------------------|
-| `/stageclock/play`       | Démarrer            |
-| `/stageclock/pause`      | Pause               |
-| `/stageclock/toggle`     | Play / Pause        |
-| `/stageclock/reset`      | Remettre à zéro     |
-| `/stageclock/next`       | Scène suivante      |
-| `/stageclock/prev`       | Scène précédente    |
-| `/stageclock/plus30`     | +30 secondes        |
-| `/stageclock/minus30`    | −30 secondes        |
-
+| Adresse OSC               | Action                  |
+|--------------------------|-------------------------|
+| `/stageclock/play`       | Démarrer                |
+| `/stageclock/pause`      | Pause                   |
+| `/stageclock/toggle`     | Play / Pause            |
+| `/stageclock/reset`      | Remettre à zéro         |
+| `/stageclock/next`       | Scène suivante          |
+| `/stageclock/prev`       | Scène précédente        |
+| `/stageclock/plus5`      | +5 secondes             |
+| `/stageclock/minus5`     | −5 secondes             |
+| `/stageclock/plus30`     | +30 secondes            |
+| `/stageclock/minus30`    | −30 secondes            |
+| `/stageclock/plus60`     | +60 secondes            |
+| `/stageclock/minus60`    | −60 secondes            |
 
 ### WebSocket (port 8080)
 
@@ -35,12 +41,16 @@ Envoyer du JSON :
 ```json
 { "cmd": "play" }
 { "cmd": "next" }
+{ "cmd": "prev" }
+{ "cmd": "plus5" }
+{ "cmd": "minus5" }
 { "cmd": "plus30" }
 ```
 
 ### Module Companion dédié
 
-Un module Node.js Companion peut être créé dans `companion-module/` pour apparaître nativement dans l'interface Companion avec des boutons pré-configurés.
+Le dossier `companion-module-stageclock/` contient un module Bitfocus Companion natif.  
+Voir les instructions d'installation dans ce dossier.
 
 ---
 
@@ -50,14 +60,13 @@ Les sessions sont sauvegardées en JSON :
 
 ```json
 {
-  "version": "1.0",
+  "version": "2.0",
   "scenes": [
     { "id": "abc123", "name": "Ouverture", "fullName": "Ouverture de la conférence", "duration": 300 }
   ],
   "settings": {
     "timerColor": "#ffffff",
     "fontSize": "normal",
-    "autoAdvance": false,
     "companionProtocol": "both",
     "oscPort": 5005,
     "wsPort": 8080
@@ -99,8 +108,13 @@ stageclock/
 │       └── styles/
 │           ├── global.css
 │           └── output.css
-├── index.html               ← Fenêtre contrôleur
-├── output.html              ← Fenêtre output
+├── companion-module-stageclock/  ← Module Bitfocus Companion
+├── scripts/
+│   └── generate-icon.mjs    ← Génération icône (sans dépendances)
+├── build/
+│   └── icon.ico             ← Icône générée automatiquement
+├── index.html
+├── output.html
 ├── vite.config.ts
 └── package.json
 ```

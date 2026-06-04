@@ -7,8 +7,14 @@ const isDev = !app.isPackaged
 
 let controllerWin: BrowserWindow | null = null
 let outputWin:     BrowserWindow | null = null
+<<<<<<< HEAD
 let oscPort:  any = null
 let wsServer: any = null
+=======
+let oscPort:    any = null
+let wsServer:   any = null
+let httpServer: any = null
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
 
 // ─── NDI ───────────────────────────────────────────────────────────────────
 // Architecture : fenêtre BrowserWindow offscreen (invisible) à la résolution
@@ -341,6 +347,7 @@ ipcMain.handle('session:open', async () => {
 // ─── IPC — Companion (OSC / WebSocket) ────────────────────────────────────
 
 ipcMain.handle('osc:start', (_e, port: number = 5005) => {
+<<<<<<< HEAD
   try {
     const OSC = require('osc')
     oscPort = new OSC.UDPPort({ localAddress: '0.0.0.0', localPort: port })
@@ -373,6 +380,72 @@ ipcMain.handle('ws:start', (_e, port: number = 8080) => {
   } catch (e) {
     return { success: false, error: String(e) }
   }
+=======
+  return new Promise(resolve => {
+    try {
+      // Close any existing instance first
+      try { oscPort?.close() } catch {}
+      oscPort = null
+
+      const OSC = require('osc')
+      const p = new OSC.UDPPort({ localAddress: '0.0.0.0', localPort: port })
+
+      p.on('error', (err: Error) => {
+        resolve({ success: false, error: err.message })
+      })
+      p.on('ready', () => {
+        oscPort = p
+        resolve({ success: true, port })
+      })
+      p.on('message', (msg: { address: string; args: unknown[] }) => {
+        controllerWin?.webContents.send('osc:command', {
+          cmd: msg.address.replace('/stageclock/', ''),
+          args: msg.args,
+        })
+      })
+      p.open()
+    } catch (e) {
+      resolve({ success: false, error: String(e) })
+    }
+  })
+})
+
+ipcMain.handle('ws:start', (_e, port: number = 8080) => {
+  return new Promise(resolve => {
+    try {
+      // Close any existing instances first
+      try { wsServer?.close() } catch {}
+      try { httpServer?.close() } catch {}
+      wsServer = null
+      httpServer = null
+
+      const http = require('http')
+      const { WebSocketServer } = require('ws')
+
+      // Create HTTP server separately so we can attach error handler before listen
+      const srv = http.createServer()
+      srv.on('error', (err: Error) => {
+        resolve({ success: false, error: err.message })
+      })
+      srv.listen(port, () => {
+        const wss = new WebSocketServer({ server: srv })
+        wss.on('connection', (ws: any) => {
+          ws.on('message', (raw: Buffer) => {
+            try {
+              const { cmd, args } = JSON.parse(raw.toString())
+              controllerWin?.webContents.send('osc:command', { cmd, args: args ?? [] })
+            } catch {}
+          })
+        })
+        httpServer = srv
+        wsServer = wss
+        resolve({ success: true, port })
+      })
+    } catch (e) {
+      resolve({ success: false, error: String(e) })
+    }
+  })
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
 })
 
 // ─── APP LIFECYCLE ─────────────────────────────────────────────────────────
@@ -405,6 +478,10 @@ app.on('will-quit', () => {
   stopNDI()
   try { oscPort?.close() } catch {}
   try { wsServer?.close() } catch {}
+<<<<<<< HEAD
+=======
+  try { httpServer?.close() } catch {}
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
 })
 
 app.on('window-all-closed', () => {

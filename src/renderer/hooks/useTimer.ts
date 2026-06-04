@@ -18,7 +18,10 @@ self.onmessage = (e) => {
 export function useTimer() {
   const { timerStatus } = useStore()
   const workerRef = useRef<Worker | null>(null)
+<<<<<<< HEAD
   const alertedRef = useRef(false)
+=======
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
 
   // Create worker once
   useEffect(() => {
@@ -30,6 +33,7 @@ export function useTimer() {
       const state = useStore.getState()
       if (state.timerStatus === 'running' || state.timerStatus === 'overtime') {
         state.tick()
+<<<<<<< HEAD
 
         // Sound alert at 0
         const remaining = state.total - (state.elapsed + 1)
@@ -40,6 +44,9 @@ export function useTimer() {
         if (remaining > 5) alertedRef.current = false
       }
       // Always sync after any tick (covers play, pause, scene change)
+=======
+      }
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
       syncToOutput()
     }
 
@@ -87,6 +94,7 @@ function syncToOutput() {
   })
 }
 
+<<<<<<< HEAD
 function playAlert() {
   try {
     const ctx = new AudioContext()
@@ -101,3 +109,5 @@ function playAlert() {
     osc.stop(ctx.currentTime + 0.4)
   } catch {}
 }
+=======
+>>>>>>> 32413bf (V2.0.0 - bouton precedente, formats duree, date/heure output, fix OSC/WS, icone)
