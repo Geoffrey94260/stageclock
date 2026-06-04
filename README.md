@@ -24,10 +24,10 @@ Timer de scène professionnel pour événements live — Windows.
 | `/stageclock/toggle`     | Play / Pause        |
 | `/stageclock/reset`      | Remettre à zéro     |
 | `/stageclock/next`       | Scène suivante      |
+| `/stageclock/prev`       | Scène précédente    |
 | `/stageclock/plus30`     | +30 secondes        |
 | `/stageclock/minus30`    | −30 secondes        |
-| `/stageclock/plus60`     | +60 secondes        |
-| `/stageclock/minus60`    | −60 secondes        |
+
 
 ### WebSocket (port 8080)
 
