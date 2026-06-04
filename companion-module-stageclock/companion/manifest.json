@@ -1,0 +1,15 @@
+{
+  "id": "stageclock",
+  "name": "Stageclock",
+  "shortname": "Stageclock",
+  "description": "Timer de scène professionnel — contrôle Play/Pause, Reset, scènes, ajustements",
+  "version": "2.0.0",
+  "category": "utility",
+  "keywords": ["timer", "stage", "clock", "scene", "live", "event"],
+  "manufacturer": "Stageclock",
+  "products": ["Stageclock"],
+  "supportsUpgradePaths": false,
+  "runtime": {
+    "type": "node18"
+  }
+}

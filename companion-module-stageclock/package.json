@@ -1,0 +1,11 @@
+{
+  "name": "companion-module-stageclock",
+  "version": "2.0.0",
+  "description": "Bitfocus Companion module for Stageclock",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@companion-module/base": "^1.8.0",
+    "ws": "^8.16.0"
+  }
+}
